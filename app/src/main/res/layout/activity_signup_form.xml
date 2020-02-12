@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:padding="30dp"
+    android:gravity="center"
+    tools:context=".Signup_form">
+
+    <Spinner
+        android:id="@+id/type_of_crime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:entries="@array/crime"
+
+        android:gravity="center" />
+
+    <EditText
+        android:id="@+id/Description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/type_of_crime"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="Describe The Crime"
+        android:inputType="textMultiLine" />
+
+    <Button
+
+        android:id="@+id/button_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/button_rounded"
+        android:backgroundTint="@color/colorAccent"
+        android:gravity="center"
+        android:text="Report"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:id="@+id/button_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Description"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_rounded"
+        android:backgroundTint="@color/colorAccent"
+        android:gravity="center"
+        android:text="Select Picture"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:id="@+id/upld_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button_image"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_rounded"
+        android:backgroundTint="@color/colorAccent"
+        android:gravity="center"
+        android:text="Camera"
+        android:textColor="#ffffff" />
+
+
+    <ImageView
+        android:id="@+id/imgView"
+        android:layout_width="250dp"
+        android:layout_height="175dp"
+        android:layout_below="@+id/upld_button"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="30dp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/button_store"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button_image"
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@+id/upld_button"
+        android:background="@drawable/button_rounded"
+        android:backgroundTint="@color/colorAccent"
+        android:gravity="center"
+        android:text="Submit"
+        android:textColor="#ffffff" />
+
+</RelativeLayout>
