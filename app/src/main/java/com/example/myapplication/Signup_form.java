@@ -22,12 +22,14 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.UploadTask;
 
 
 import java.io.File;
@@ -43,22 +45,23 @@ import java.util.UUID;
 
 
 public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatActivity {
-
+    String url;
     EditText Description;
     Button button_submit;
     Spinner type_of_crime;
     private Button button_image, upld_button, button_store;
     private ImageView imageView;
 
-
+    int a = 0;
     private Uri filePath;
 
     private final int PICK_IMAGE_REQUEST = 71;
 
     DatabaseReference mydatabase;
     FirebaseAuth mauth;
-    com.google.firebase.storage.FirebaseStorage firebaseStorage = com.google.firebase.storage.FirebaseStorage.getInstance();
-    private String status="Reported";
+    com.google.firebase.storage.FirebaseStorage storage = com.google.firebase.storage.FirebaseStorage.getInstance();
+    private String status = "Reported";
+    com.google.firebase.storage.StorageReference storageRef = storage.getReferenceFromUrl("gs://myapplication2-91004.appspot.com/");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,11 +69,8 @@ public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatAct
         setContentView(R.layout.activity_signup_form);
         getSupportActionBar().setTitle("Report a Crime");
 
-
         mydatabase = FirebaseDatabase.getInstance().getReference().child("Report");
         mauth = FirebaseAuth.getInstance();
-
-
 
         Description = findViewById(R.id.Description);
         button_submit = (Button) findViewById(R.id.button_submit);
@@ -89,7 +89,9 @@ public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatAct
             public void onClick(View v) {
                 chooseImage();
             }
+
             private void chooseImage() {
+                a = 1;
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -99,18 +101,11 @@ public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatAct
 
         upld_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                //uploadImage();
-                try{
-                    Intent inte = new Intent();
-                    inte.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(inte, 1);
-                    inte.setType("image/*");
-
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                    Toast.makeText(Signup_form.this,"Permission to Open Camera Denied", Toast.LENGTH_LONG).show();
+            public void onClick(android.view.View v) {
+                a=2;
+                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePicture.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePicture, 1);
                 }
             }
         });
@@ -130,17 +125,18 @@ public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatAct
 
                 HashMap<String, String> reports = new HashMap<String, String>();
                 String CurrentDateTime = DateFormat.getDateTimeInstance().format(new Date());
-                reports.put("Description",Description.getText().toString());
-                reports.put("Type of Crime",type_of_crime.getSelectedItem().toString());
-                reports.put("Latitude",Double.toString(latitude));
-                reports.put("Longitude",Double.toString(longitude));
-                reports.put("Status",status);
+                reports.put("Description", Description.getText().toString());
+                reports.put("Type of Crime", type_of_crime.getSelectedItem().toString());
+                reports.put("Latitude", Double.toString(latitude));
+                reports.put("Longitude", Double.toString(longitude));
+                reports.put("Status", status);
+                reports.put("URL", url);
 
                 mydatabase.child(mauth.getCurrentUser().getPhoneNumber()).child(run()).setValue(reports).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(Signup_form.this,"Your Report has been Submitted", Toast.LENGTH_LONG).show();
-                        Intent inte = new Intent(Signup_form.this,MapsActivity.class);
+                        Toast.makeText(Signup_form.this, "Your Report has been Submitted", Toast.LENGTH_LONG).show();
+                        Intent inte = new Intent(Signup_form.this, MapsActivity.class);
                         startActivity(inte);
                         finish();
 
@@ -149,41 +145,69 @@ public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatAct
 
             }
 
-            private String run() {
+            public String run() {
                 Calendar calc = Calendar.getInstance();
                 String currentDate = DateFormat.getDateInstance().format(calc.getTime());
                 String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-                return (currentDate+" "+currentTime);
+                return (currentDate + " " + currentTime);
             }
 
         });
 
-
-
     }
 
-
     private void startPosting() {
+        if (filePath != null) {
+            Calendar calc = Calendar.getInstance();
+            String currentDate = DateFormat.getDateInstance().format(calc.getTime());
+            String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+            com.google.firebase.storage.StorageReference childRef = storageRef.child(mauth.getCurrentUser().getPhoneNumber()).child((currentDate + " " + currentTime));
+            //uploading the image
+            UploadTask uploadTask = childRef.putFile(filePath);
 
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(Signup_form.this, "Upload Successful", Toast.LENGTH_SHORT).show();
+                    url = taskSnapshot.getStorage().getDownloadUrl().toString();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(Signup_form.this, "Upload Failed -> " + e, Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(Signup_form.this, "Select an image", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null )
-        {
-            filePath = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                imageView.setImageBitmap(bitmap);
+        if (a == 2) {
+            if (requestCode == 1 && resultCode == RESULT_OK) {
+                Bundle extras = data.getExtras();
+                Bitmap image = (Bitmap) extras.get("data");
+                imageView.setImageBitmap(image);
+                filePath = data.getData();
             }
-            catch (IOException e)
-            {
-                e.printStackTrace();
+        }
+        else
+        {
+            if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                    && data != null && data.getData() != null) {
+                filePath = data.getData();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                    imageView.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-}
+    }
+

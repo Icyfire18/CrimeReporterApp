@@ -5,12 +5,14 @@ public class Report {
     private String type_of_crime;
     private String description;
     private String status;
+    private String url;
 
 
-    public Report(String type_of_crime, String description, String status){
+    public Report(String type_of_crime, String description, String status, String url){
         this.type_of_crime=type_of_crime;
         this.description=description;
         this.status=status;
+        this.url=url;
     }
 
     public Report() {
@@ -39,5 +41,13 @@ public class Report {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

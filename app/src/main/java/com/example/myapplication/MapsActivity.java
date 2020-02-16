@@ -18,8 +18,10 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity<mDatabase> extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Button button;
@@ -55,7 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         button_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent inte = new Intent(MapsActivity.this,ScrollingActivity.class);
+                Intent inte = new Intent(MapsActivity.this, history.class);
                 startActivity(inte);
             }
         });
