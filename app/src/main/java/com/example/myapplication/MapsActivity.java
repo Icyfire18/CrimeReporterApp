@@ -100,7 +100,7 @@ public class MapsActivity<mDatabase> extends FragmentActivity implements OnMapRe
         UiSettings mapSettings;
         mapSettings = mMap.getUiSettings();
         mapSettings.setRotateGesturesEnabled(true);
-        mapSettings.setZoomControlsEnabled(true);
+        //mapSettings.setZoomControlsEnabled(true);
         mapSettings.setCompassEnabled(true);
         float zoomLevel = 16.0f; //This goes up to 21
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, zoomLevel));

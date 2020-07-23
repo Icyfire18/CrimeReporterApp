@@ -4,9 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -29,6 +32,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 
@@ -68,6 +72,9 @@ public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatAct
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_form);
         getSupportActionBar().setTitle("Report a Crime");
+
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#00DFFC"));
+        getSupportActionBar().setBackgroundDrawable(colorDrawable);
 
         mydatabase = FirebaseDatabase.getInstance().getReference().child("Report");
         mauth = FirebaseAuth.getInstance();
@@ -122,27 +129,31 @@ public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatAct
             @Override
             public void onClick(View v) {
 
+                if(!(Description.getText().toString().equals(""))) {
+                    HashMap<String, String> reports = new HashMap<String, String>();
+                    String CurrentDateTime = DateFormat.getDateTimeInstance().format(new Date());
+                    reports.put("Description", Description.getText().toString());
+                    reports.put("Type of Crime", type_of_crime.getSelectedItem().toString());
+                    reports.put("Latitude", Double.toString(latitude));
+                    reports.put("Longitude", Double.toString(longitude));
+                    reports.put("Status", status);
+                    reports.put("URL", url);
 
-                HashMap<String, String> reports = new HashMap<String, String>();
-                String CurrentDateTime = DateFormat.getDateTimeInstance().format(new Date());
-                reports.put("Description", Description.getText().toString());
-                reports.put("Type of Crime", type_of_crime.getSelectedItem().toString());
-                reports.put("Latitude", Double.toString(latitude));
-                reports.put("Longitude", Double.toString(longitude));
-                reports.put("Status", status);
-                reports.put("URL", url);
+                    mydatabase.child(mauth.getCurrentUser().getPhoneNumber()).child(run()).setValue(reports).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Toast.makeText(Signup_form.this, "Your Report has been Submitted", Toast.LENGTH_LONG).show();
+                            Intent inte = new Intent(Signup_form.this, MapsActivity.class);
+                            startActivity(inte);
+                            finish();
 
-                mydatabase.child(mauth.getCurrentUser().getPhoneNumber()).child(run()).setValue(reports).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(Signup_form.this, "Your Report has been Submitted", Toast.LENGTH_LONG).show();
-                        Intent inte = new Intent(Signup_form.this, MapsActivity.class);
-                        startActivity(inte);
-                        finish();
-
-                    }
-                });
-
+                        }
+                    });
+                }
+                else{
+                    Toast.makeText(Signup_form.this, "Please fill the Description.", Toast.LENGTH_SHORT).show();
+                    Description.requestFocus();
+                }
             }
 
             public String run() {
@@ -191,7 +202,8 @@ public class Signup_form<FirebaseStorage, StorageReference> extends AppCompatAct
                 Bundle extras = data.getExtras();
                 Bitmap image = (Bitmap) extras.get("data");
                 imageView.setImageBitmap(image);
-                filePath = data.getData();
+
+
             }
         }
         else

@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Signup");
+
+        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#00DFFC"));
+        getSupportActionBar().setBackgroundDrawable(colorDrawable);
 
         SharedPreferences preferences = getSharedPreferences("Signin", Context.MODE_PRIVATE);
         final SharedPreferences.Editor  editor = preferences.edit();
